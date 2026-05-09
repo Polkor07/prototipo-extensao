@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oficina Motocross</title>
+    <style>
+        :root {
+            --primary: #e63946;
+            --dark: #1d3557;
+            --light: #f1faee;
+            --gray: #ccc;
+        }
+
+        body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; }
+        .hidden { display: none !important; }
+        
+        header { background: var(--dark); color: white; padding: 1rem; text-align: center; }
+        .container { max-width: 800px; margin: 2rem auto; padding: 1rem; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+
+        .btn-group { display: flex; gap: 1rem; justify-content: center; margin-top: 2rem; }
+        button { padding: 10px 20px; cursor: pointer; border: none; border-radius: 5px; background: var(--primary); color: white; font-weight: bold; }
+        button.secondary { background: var(--dark); }
+
+        input, select, textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid var(--gray); border-radius: 4px; box-sizing: border-box; }
+        
+        .card { border: 1px solid var(--gray); padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Oficina MotoExpert</h1>
+</header>
+
+<div class="container">
+    
+    <!-- TELA INICIAL: ESCOLHA DE PERFIL -->
+    <section id="view-home">
+        <h2 style="text-align: center;">Bem-vindo! Como deseja acessar?</h2>
+        <div class="btn-group">
+            <button onclick="showView('view-cadastro-cliente')">Sou Cliente</button>
+            <button class="secondary" onclick="showView('view-login-funcionario')">Sou Funcionário</button>
+        </div>
+    </section>
+
+    <!-- CADASTRO CLIENTE -->
+    <section id="view-cadastro-cliente" class="hidden">
+        <h2>Cadastro de Cliente</h2>
+        <input type="text" id="c-nome" placeholder="Nome Completo">
+        <input type="tel" id="c-tel" placeholder="Telefone">
+        <input type="text" id="c-end" placeholder="Endereço">
+        <button onclick="cadastrarCliente()">Finalizar Cadastro</button>
+        <button class="secondary" onclick="showView('view-home')">Voltar</button>
+    </section>
+
+    <!-- LOGIN FUNCIONÁRIO -->
+    <section id="view-login-funcionario" class="hidden">
+        <h2>Login Administrativo</h2>
+        <input type="text" id="f-user" placeholder="Usuário">
+        <input type="password" id="f-pass" placeholder="Senha">
+        <button onclick="loginFuncionario()">Entrar</button>
+        <button class="secondary" onclick="showView('view-home')">Voltar</button>
+    </section>
+
+    <!-- MENU PRINCIPAL CLIENTE -->
+    <section id="view-menu-cliente" class="hidden">
+        <h2>Olá, <span id="user-display-name"></span>!</h2>
+        <h3>Agendar Serviço</h3>
+        <select id="servico-select">
+            <option value="Troca de Óleo">Troca de Óleo - R$ 50,00</option>
+            <option value="Revisão Geral">Revisão Geral - R$ 200,00</option>
+            <option value="Troca de Pneu">Troca de Pneu - R$ 80,00</option>
+        </select>
+        <input type="datetime-local" id="agendamento-data">
+        <button onclick="agendar()">Confirmar Agendamento</button>
+        <button class="secondary" onclick="showView('view-home')">Sair</button>
+    </section>
+
+    <!-- DASHBOARD FUNCIONÁRIO -->
+    <section id="view-menu-funcionario" class="hidden">
+        <h2>Painel de Controle</h2>
+        <div class="dashboard-grid">
+            <div>
+                <h3>📦 Estoque de Peças</h3>
+                <div id="lista-estoque">
+                    <div class="card">Pneu Aro 17 | Qtd: 5 <button onclick="alert('Editar...')">✏️</button></div>
+                    <div class="card">Pastilha Freio | Qtd: 12 <button onclick="alert('Editar...')">✏️</button></div>
+                </div>
+            </div>
+            <div>
+                <h3>📅 Agendamentos Hoje</h3>
+                <div id="lista-agendamentos">
+                    <!-- Dinâmico -->
+                </div>
+            </div>
+        </div>
+        <button class="secondary" onclick="showView('view-home')" style="margin-top: 20px;">Sair do Sistema</button>
+    </section>
+
+</div>
+
+<script>
+    // Lógica de Navegação Simple Single Page Application (SPA)
+    function showView(viewId) {
+        document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+        document.getElementById(viewId).classList.remove('hidden');
+    }
+
+    function cadastrarCliente() {
+        const nome = document.getElementById('c-nome').value;
+        if(nome) {
+            document.getElementById('user-display-name').innerText = nome;
+            showView('view-menu-cliente');
+        } else { alert("Preencha os campos!"); }
+    }
+
+    function loginFuncionario() {
+        const user = document.getElementById('f-user').value;
+        const pass = document.getElementById('f-pass').value;
+        // Simulação simples de login
+        if(user === "admin" && pass === "123") {
+            showView('view-menu-funcionario');
+        } else { alert("Acesso Negado!"); }
+    }
+
+    function agendar() {
+        const servico = document.getElementById('servico-select').value;
+        const data = document.getElementById('agendamento-data').value;
+        if(data) {
+            alert(`Sucesso! Agendado: ${servico} para ${data}`);
+            // Aqui você enviaria para o banco de dados
+            const lista = document.getElementById('lista-agendamentos');
+            lista.innerHTML += `<div class="card"><strong>${servico}</strong><br>${data}</div>`;
+            showView('view-home');
+        } else { alert("Escolha uma data!"); }
+    }
+</script>
+
+</body>
+</html>
